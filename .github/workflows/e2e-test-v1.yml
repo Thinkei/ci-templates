@@ -11,7 +11,6 @@ jobs:
       matrix:
         target: [test-eh-chrome, test-kp-cross-platform]
     runs-on: ci-general
-    needs: deploy_int
     steps:
       - name: hold on test-eh-chrome in few seconds # Issue: https://github.com/convictional/trigger-workflow-and-wait/issues/61
         run: if [[ ${{ matrix.target }} == "test-eh-chrome" ]] ; then sleep 10; fi
