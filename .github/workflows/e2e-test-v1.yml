@@ -22,7 +22,7 @@ jobs:
         with:
           owner: ${{ github.repository_owner }}
           repo: web-app-e2e-test
-          github_token: ${{ secrets.GH_DISPATCH_TOKEN }}
+          github_token: ${{ secrets.GH_DISPATCH_TOKEN_PUB }}
           workflow_file_name: dispatch_ci.yml
           ref: main
           client_payload: '{"testsuite":"${{ matrix.target }}"}'
