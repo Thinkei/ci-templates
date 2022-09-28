@@ -1,0 +1,27 @@
+name: Run E2E test on integration
+
+on:
+  workflow_call:
+
+jobs:
+  run_e2e:
+    name: run_e2e
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [test-eh-chrome, test-kp-cross-platform]
+    runs-on: ci-general
+    needs: deploy_int
+    steps:
+      - name: hold on test-eh-chrome in few seconds # Issue: https://github.com/convictional/trigger-workflow-and-wait/issues/61
+        run: if [[ ${{ matrix.target }} == "test-eh-chrome" ]] ; then sleep 10; fi
+      - uses: convictional/trigger-workflow-and-wait@v1.6.3
+        name: trigger ${{ matrix.target }} and wait for it
+        with:
+          owner: ${{ github.repository_owner }}
+          repo: web-app-e2e-test
+          github_token: ${{ secrets.GH_DISPATCH_TOKEN }}
+          workflow_file_name: dispatch_ci.yml
+          ref: main
+          client_payload: '{"testsuite":"${{ matrix.target }}"}'
+          propagate_failure: true # Fail current job if downstream job fails.
