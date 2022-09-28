@@ -1,6 +1,9 @@
 name: Run E2E test on integration
 
 on:
+  push:
+    branches:
+      - 'master'
   workflow_call:
 
 jobs:
