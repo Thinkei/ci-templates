@@ -1,0 +1,25 @@
+name: ci.dockerize
+on: [workflow_call]
+
+env:      
+  IMAGE_REPOSITORY: ${{ secrets.EH_AWS_ECR_PROD }}
+  IMAGE_NAME: ${{ secrets.EH_AWS_ECR_PROD }}/employmenthero/${{ github.event.repository.name }}:${{ github.ref_name }}_${{ github.sha }}
+  BUNDLE_GEMS__CONTRIBSYS__COM: ${{ secrets.BUNDLE_GEMS__CONTRIBSYS__COM }}
+  BUNDLE_GEM__FURY__IO: ${{ secrets.BUNDLE_GEM__FURY__IO }} 
+
+jobs:
+  dockerize:
+    name: dockerize
+    runs-on: ci-builder
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build and Push to ECR
+        run: |
+          aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${{ env.IMAGE_REPOSITORY }}
+          docker build \
+          --build-arg BUNDLE_GEMS__CONTRIBSYS__COM=${{ env.BUNDLE_GEMS__CONTRIBSYS__COM }} \
+          --build-arg BUNDLE_GEM__FURY__IO=${{ env.BUNDLE_GEM__FURY__IO }} \
+          -t ${{ env.IMAGE_NAME }} .
+          docker push ${{ env.IMAGE_NAME }}
+          docker logout ${{ env.IMAGE_REPOSITORY }}
